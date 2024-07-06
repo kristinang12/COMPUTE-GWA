@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compute GWA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-brand">
+            Compute GWA
+        </div>
+        <div class="sidebar">
+            <a href="/">Home</a>
+        </div>
+    </header>
+    <main class="cont">
+        <div class="container">
+            <h1> Calculate Your General Weighted Average: <br>GWA of 1 is Excellence</h1>
+            <form id="gwa-form" action="{{ url_for('calculate') }}" method="post">
+                <div id="grades-container">
+                    <div class="grade-row">
+                        <label for="grade">Grade:</label>
+                        <input type="text" name="grade" required>
+                        <label for="unit">Unit:</label>
+                        <input type="text" name="unit" required>
+                        <button type="button" onclick="removeRow(this)">x</button>
+                    </div>
+                </div>
+                <button type="button" onclick="addRow()">Add another subject</button>
+                <br><br>
+                <input type="submit" value="Compute GWA">
+            </form>
+
+            <div id="result"></div>
+        </div>
+    </main>
+    <script>
+        function addRow() {
+            const container = document.getElementById('grades-container');
+            const div = document.createElement('div');
+            div.className = 'grade-row';
+            div.innerHTML = `
+                <label for="grade">Grade:</label>
+                <input type="text" name="grade" required>
+                <label for="unit">Unit:</label>
+                <input type="text" name="unit" required>
+                <button type="button" onclick="removeRow(this)">x</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeRow(button) {
+            const row = button.parentNode;
+            row.parentNode.removeChild(row);
+        }
+
+        document.getElementById('gwa-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+
+            fetch('{{ url_for("calculate") }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('result').innerHTML = data;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
